@@ -1,0 +1,212 @@
+<ion-content [fullscreen]="true" class="retro-container">
+  <div class="retro-grid"></div>
+  <div class="retro-gradient"></div>
+
+  <!-- Tela Home -->
+  <div *ngIf="screen === 'home'" class="retro-content">
+    <div class="retro-card card-pulse">
+      <div class="card-corners">
+        <span class="corner corner-tl"></span>
+        <span class="corner corner-tr"></span>
+        <span class="corner corner-bl"></span>
+        <span class="corner corner-br"></span>
+      </div>
+
+      <div class="icon-container">
+        <ion-icon name="radio" class="main-icon"></ion-icon>
+      </div>
+      
+      <h1 class="main-title neon-pulse">QUIZ.EXE</h1>
+      <p class="subtitle">[NEURAL SYSTEM v2.077]</p>
+
+      <div class="input-group">
+        <label class="input-label">> ENTER_NAME:</label>
+        <ion-input
+          type="text"
+          placeholder="PLAYER_001"
+          [(ngModel)]="playerName"
+          class="retro-input"
+        ></ion-input>
+      </div>
+
+      <ion-button
+        expand="block"
+        (click)="startGame()"
+        [disabled]="!playerName.trim()"
+        class="btn btn-primary"
+      >
+        <ion-icon name="flash" slot="start"></ion-icon>
+        INITIALIZE
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        (click)="goToRanking()"
+        class="btn btn-secondary"
+      >
+        <ion-icon name="trophy" slot="start"></ion-icon>
+        LEADERBOARD
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Tela de Ranking -->
+  <div *ngIf="screen === 'ranking'" class="retro-content">
+    <div class="retro-card card-pulse">
+      <div class="ranking-header">
+        <h2 class="ranking-title">
+          <ion-icon name="trophy" class="trophy-icon"></ion-icon>
+          TOP.10
+        </h2>
+        <ion-button
+          *ngIf="ranking.length > 0"
+          (click)="clearRanking()"
+          class="btn-clear"
+          fill="clear"
+        >
+          CLEAR
+        </ion-button>
+      </div>
+
+      <div *ngIf="ranking.length === 0" class="no-data">
+        <p class="no-data-text">[NO DATA FOUND]</p>
+        <p class="no-data-subtext">Aguardando registros...</p>
+      </div>
+
+      <div *ngIf="ranking.length > 0" class="ranking-list">
+        <div
+          *ngFor="let entry of ranking; let i = index"
+          [ngClass]="getRankClass(i)"
+        >
+          <div class="ranking-left">
+            <span class="ranking-number">{{ padNumber(i + 1) }}</span>
+            <ion-icon
+              *ngIf="showAward(i)"
+              name="medal"
+              class="award-icon"
+            ></ion-icon>
+            <div class="ranking-info">
+              <p class="ranking-name">{{ entry.name }}</p>
+              <p class="ranking-date">{{ entry.date }}</p>
+            </div>
+          </div>
+          <div class="ranking-right">
+            <span class="ranking-score">{{ entry.score }}</span>
+            <p class="ranking-pts">PTS</p>
+          </div>
+        </div>
+      </div>
+
+      <ion-button
+        expand="block"
+        (click)="goToHome()"
+        class="btn btn-return"
+      >
+        &lt;&lt; RETURN
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Tela de Resultado -->
+  <div *ngIf="screen === 'result'" class="retro-content">
+    <div class="retro-card card-pulse result-card">
+      <div class="icon-container">
+        <ion-icon name="trophy" class="trophy-big"></ion-icon>
+      </div>
+      
+      <h2 class="result-title neon-pulse">MISSION</h2>
+      <h3 class="result-subtitle">COMPLETE!</h3>
+      
+      <div class="result-score-section">
+        <p class="result-player">PLAYER: {{ playerName }}</p>
+        <p class="result-score">{{ finalScore }}</p>
+        <p class="result-total">/ {{ questions.length * 10 }} POINTS</p>
+      </div>
+      
+      <div class="efficiency-box">
+        <p class="efficiency-text">
+          EFFICIENCY: {{ percentage.toFixed(0) }}%
+        </p>
+        <div class="progress-bar">
+          <div
+            class="progress-fill"
+            [style.width.%]="percentage"
+          ></div>
+        </div>
+      </div>
+
+      <ion-button
+        expand="block"
+        (click)="resetGame()"
+        class="btn btn-primary"
+      >
+        <ion-icon name="refresh" slot="start"></ion-icon>
+        RESTART
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        (click)="goToRanking()"
+        class="btn btn-secondary"
+      >
+        VIEW SCORES
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Tela do Jogo -->
+  <div *ngIf="screen === 'game'" class="game-container">
+    <!-- Header -->
+    <div class="game-header">
+      <div class="header-item">
+        <p class="header-label">QUERY</p>
+        <p class="header-value">
+          {{ padNumber(currentQuestion + 1) }}/{{ padNumber(questions.length) }}
+        </p>
+      </div>
+      <div class="header-item text-right">
+        <p class="header-label">SCORE</p>
+        <p class="header-score">{{ score }}</p>
+      </div>
+    </div>
+
+    <!-- Pergunta -->
+    <div class="question-card card-pulse">
+      <div class="processing-text">
+        <span>> PROCESSING...</span>
+      </div>
+      <h2 class="question-text">
+        {{ currentQuestionData.question }}
+      </h2>
+
+      <div class="options-list">
+        <ion-button
+          *ngFor="let option of currentQuestionData.options; let i = index"
+          expand="block"
+          (click)="handleAnswer(i)"
+          [disabled]="selectedAnswer !== null"
+          [ngClass]="getOptionClass(i)"
+        >
+          <span class="option-letter">[{{ getOptionLetter(i) }}]</span>
+          {{ option }}
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Progresso -->
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-label">PROGRESS</span>
+        <span class="progress-percentage">
+          {{ progressPercentage }}%
+        </span>
+      </div>
+      <div class="progress-container">
+        <div
+          class="progress-bar-fill"
+          [style.width.%]="progressPercentage"
+        ></div>
+      </div>
+    </div>
+  </div>
+</ion-content>
