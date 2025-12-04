@@ -2,15 +2,17 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { QuizGamePageRoutingModule } from './quiz-game-routing.module';
-import { QuizGamePage } from './quiz-game.page';
+import { IonicStorageModule } from '@ionic/storage-angular';
+import { HomePageRoutingModule } from './home-routing.module';
+import { QuizGamePage } from './home.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    QuizGamePageRoutingModule
+    HomePageRoutingModule,
+    IonicStorageModule.forRoot()
   ],
   declarations: [QuizGamePage]
 })
