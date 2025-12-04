@@ -1,0 +1,7 @@
+{
+  "name": "robloqui",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
